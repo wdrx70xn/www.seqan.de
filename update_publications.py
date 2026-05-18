@@ -1,6 +1,7 @@
 import bibtexparser
 import json
 import os
+import shutil
 import urllib.request
 import yaml
 
@@ -11,15 +12,14 @@ bib_filename = "_data/publications.bib"
 bib_file_url = "https://publications.imp.fu-berlin.de/cgi/exportview/divisions/group=5Falgbioinf/BibTeX/group=5Falgbioinf.bib"
 json_file_url = "https://publications.imp.fu-berlin.de/cgi/exportview/divisions/group=5Falgbioinf/JSON/group=5Falgbioinf.js"
 
-# download the bibtex file
-bib_file_downlaoder = urllib.request.URLopener()
-bib_file_downlaoder.retrieve(bib_file_url, bib_filename)
-del bib_file_downlaoder
+def download_file(url, destination):
+    with urllib.request.urlopen(url) as response, open(destination, "wb") as out_file:
+        shutil.copyfileobj(response, out_file)
 
-# download the json file
-json_file_downloader = urllib.request.URLopener()
-json_file_downloader.retrieve(json_file_url, json_filename)
-del json_file_downloader
+
+# download publication files
+download_file(bib_file_url, bib_filename)
+download_file(json_file_url, json_filename)
 
 # parse the bibtex file
 with open(bib_filename) as bib_file:
