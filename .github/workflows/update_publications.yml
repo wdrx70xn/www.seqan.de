@@ -1,58 +1,48 @@
 name: Update Publications
-
-on:
-  # Every Friday
+'on':
   schedule:
-    - cron: '0 6 * * FRI'
-  # Enables a manual trigger, may run on any branch
-  workflow_dispatch:
-
+  - cron: 0 6 * * FRI
+  workflow_dispatch: null
 env:
   TZ: Europe/Berlin
-
 defaults:
   run:
     shell: bash -lEexo pipefail {0}
-
 jobs:
   update_publications:
     name: Update Publications
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    if: github.repository_owner == 'wdrx70xn' || github.event_name == 'workflow_dispatch'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v7
-        with:
-          gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
-          passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-
-      - name: Get cached python environment
-        uses: actions/cache@v5
-        with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ hashFiles('.github/workflows/misc/environment.yml') }}
-
-      - name: Setup python environment
-        uses: conda-incubator/setup-miniconda@v4
-        with:
-          activate-environment: update_publication
-          environment-file: .github/workflows/misc/environment.yml
-          use-only-tar-bz2: true
-
-      - name: Update publications
-        run: python update_publications.py
-
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v10
-        with:
-          author_name: seqan-actions[bot]
-          author_email: seqan-actions@users.noreply.github.com
-          message: '[CRON] Update publications'
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        token: ${{ secrets.SEQAN_ACTIONS_PAT }}
+    - name: Import GPG key
+      uses: crazy-max/ghaction-import-gpg@v7
+      with:
+        gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+        passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
+        git_user_signingkey: true
+        git_commit_gpgsign: true
+    - name: Get cached python environment
+      uses: actions/cache@v5
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-conda-${{ hashFiles('.github/workflows/misc/environment.yml')
+          }}
+    - name: Setup python environment
+      uses: conda-incubator/setup-miniconda@v4
+      with:
+        activate-environment: update_publication
+        environment-file: .github/workflows/misc/environment.yml
+        use-only-tar-bz2: true
+    - name: Update publications
+      run: python update_publications.py
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v10
+      with:
+        author_name: seqan-actions[bot]
+        author_email: seqan-actions@users.noreply.github.com
+        message: '[CRON] Update publications'
